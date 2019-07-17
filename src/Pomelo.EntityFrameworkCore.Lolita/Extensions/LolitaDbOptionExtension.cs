@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Pomelo.EntityFrameworkCore.Lolita.Update;
 using Pomelo.EntityFrameworkCore.Lolita.Delete;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.EntityFrameworkCore
 {
     public class LolitaDbOptionExtension : IDbContextOptionsExtension

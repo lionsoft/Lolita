@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 
 namespace Pomelo.EntityFrameworkCore.Lolita.Delete
 {
@@ -12,6 +11,6 @@ namespace Pomelo.EntityFrameworkCore.Lolita.Delete
 
         int Execute(DbContext db, string sql);
 
-        Task<int> ExecuteAsync(DbContext db, string sql, CancellationToken cancellationToken = default(CancellationToken));
+        Task<int> ExecuteAsync(DbContext db, string sql, CancellationToken cancellationToken = default);
     }
 }

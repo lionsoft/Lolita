@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Pomelo.EntityFrameworkCore.Lolita;
 using Pomelo.EntityFrameworkCore.Lolita.Update;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.EntityFrameworkCore
 {
     public static class ValuingExtensions
@@ -12,7 +13,7 @@ namespace Microsoft.EntityFrameworkCore
         {
             if (sql == null)
             {
-                throw new ArgumentNullException("Sql expression cannot be null.");
+                throw new ArgumentNullException(nameof(sql), "Sql expression cannot be null.");
             }
 
             var field = self.CurrentField;

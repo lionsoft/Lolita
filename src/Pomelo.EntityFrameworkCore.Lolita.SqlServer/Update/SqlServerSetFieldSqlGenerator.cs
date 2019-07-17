@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 
+// ReSharper disable once CheckNamespace
 namespace Pomelo.EntityFrameworkCore.Lolita.Update
 {
     public class SqlServerSetFieldSqlGenerator : DefaultSetFieldSqlGenerator

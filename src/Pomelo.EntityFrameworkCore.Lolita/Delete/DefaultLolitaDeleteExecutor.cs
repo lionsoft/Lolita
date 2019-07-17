@@ -11,23 +11,26 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace Pomelo.EntityFrameworkCore.Lolita.Delete
 {
     public class DefaultLolitaDeleteExecutor : ILolitaDeleteExecutor
     {
-        private static FieldInfo EntityTypesField = typeof(Model).GetTypeInfo().DeclaredFields.Single(x => x.Name == "_entityTypes");
+        public IQueryModelGenerator QueryModelGenerator { get; }
+        private static readonly FieldInfo EntityTypesField = typeof(Model).GetTypeInfo().DeclaredFields.Single(x => x.Name == "_entityTypes");
 
-        public DefaultLolitaDeleteExecutor(ICurrentDbContext CurrentDbContext, ISqlGenerationHelper SqlGenerationHelper, IDbSetFinder DbSetFinder)
+        public DefaultLolitaDeleteExecutor(IQueryModelGenerator queryModelGenerator, ICurrentDbContext CurrentDbContext, ISqlGenerationHelper SqlGenerationHelper, IDbSetFinder DbSetFinder)
         {
+            QueryModelGenerator = queryModelGenerator;
             sqlGenerationHelper = SqlGenerationHelper;
             dbSetFinder = DbSetFinder;
             context = CurrentDbContext.Context;
         }
 
-        private ISqlGenerationHelper sqlGenerationHelper;
-        private IDbSetFinder dbSetFinder;
-        private DbContext context;
+        private readonly ISqlGenerationHelper sqlGenerationHelper;
+        private readonly IDbSetFinder dbSetFinder;
+        private readonly DbContext context;
 
         protected virtual string ParseTableName(EntityType type)
         {
@@ -38,10 +41,7 @@ namespace Pomelo.EntityFrameworkCore.Lolita.Delete
             else
             {
                 var prop = dbSetFinder.FindSets(context).SingleOrDefault(y => y.ClrType == type.ClrType);
-                if (!prop.Equals(default(DbSetProperty)))
-                    tableName = prop.Name;
-                else
-                    tableName = type.ClrType.Name;
+                tableName = !prop.Equals(default(DbSetProperty)) ? prop.Name : type.ClrType.Name;
             }
             return tableName;
         }
@@ -76,11 +76,11 @@ namespace Pomelo.EntityFrameworkCore.Lolita.Delete
         public virtual string GenerateSql<TEntity>(IQueryable<TEntity> lolita) where TEntity : class, new()
         {
             var sb = new StringBuilder("DELETE FROM ");
-            var model = lolita.ElementType;
-            var visitor = lolita.CompileQuery();
+            //var model = lolita.ElementType;
+            var visitor = lolita.CompileQuery(QueryModelGenerator);
 
             var entities = (IDictionary<string, EntityType>)EntityTypesField.GetValue(context.Model);
-            var et = entities.Where(x => x.Value.ClrType == typeof(TEntity)).Single().Value;
+            var et = entities.Single(x => x.Value.ClrType == typeof(TEntity)).Value;
 
             var table = GetTableName(et);
             var fullTable = GetFullTableName(et);
@@ -97,7 +97,7 @@ namespace Pomelo.EntityFrameworkCore.Lolita.Delete
             if (visitor == null || visitor.Queries.Count == 0)
                 return "";
             var sql = visitor.Queries.First().ToString();
-            var pos = sql.IndexOf("WHERE");
+            var pos = sql.IndexOf("WHERE", StringComparison.Ordinal);
             if (pos < 0)
                 return "";
             return sql.Substring(pos)
@@ -109,7 +109,7 @@ namespace Pomelo.EntityFrameworkCore.Lolita.Delete
             return db.Database.ExecuteSqlCommand(sql);
         }
 
-        public Task<int> ExecuteAsync(DbContext db, string sql, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<int> ExecuteAsync(DbContext db, string sql, CancellationToken cancellationToken = default)
         {
             return db.Database.ExecuteSqlCommandAsync(sql, cancellationToken);
         }

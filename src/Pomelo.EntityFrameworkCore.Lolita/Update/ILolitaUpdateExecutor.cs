@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace Pomelo.EntityFrameworkCore.Lolita.Update
 {
@@ -11,6 +12,7 @@ namespace Pomelo.EntityFrameworkCore.Lolita.Update
 
         int Execute(DbContext db, string sql, object[] param);
 
-        Task<int> ExecuteAsync(DbContext db, string sql, CancellationToken cancellationToken = default(CancellationToken), params object[] param);
+        Task<int> ExecuteAsync(DbContext db, string sql, CancellationToken cancellationToken = default, params object[] param);
+        IQueryModelGenerator QueryModelGenerator { get; }
     }
 }

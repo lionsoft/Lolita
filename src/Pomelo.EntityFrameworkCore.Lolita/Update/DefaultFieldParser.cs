@@ -15,7 +15,7 @@ namespace Pomelo.EntityFrameworkCore.Lolita.Update
 {
     public class DefaultFieldParser : IFieldParser
     {
-        private static FieldInfo EntityTypesField = typeof(Model).GetTypeInfo().DeclaredFields.Single(x => x.Name == "_entityTypes");
+        private static readonly FieldInfo EntityTypesField = typeof(Model).GetTypeInfo().DeclaredFields.Single(x => x.Name == "_entityTypes");
 
         public DefaultFieldParser(ICurrentDbContext CurrentDbContext, ISqlGenerationHelper SqlGenerationHelper, IDbSetFinder DbSetFinder)
         {
@@ -24,9 +24,9 @@ namespace Pomelo.EntityFrameworkCore.Lolita.Update
             context = CurrentDbContext.Context;
         }
 
-        private ISqlGenerationHelper sqlGenerationHelper;
-        private IDbSetFinder dbSetFinder;
-        private DbContext context;
+        private readonly ISqlGenerationHelper sqlGenerationHelper;
+        private readonly IDbSetFinder dbSetFinder;
+        private readonly DbContext context;
 
         public virtual string ParseField(SqlFieldInfo field)
         {
@@ -65,10 +65,7 @@ namespace Pomelo.EntityFrameworkCore.Lolita.Update
             else
             {
                 var prop = dbSetFinder.FindSets(context).SingleOrDefault(y => y.ClrType == type.ClrType);
-                if (!prop.Equals(default(DbSetProperty)))
-                    tableName = prop.Name;
-                else
-                    tableName = type.ClrType.Name;
+                tableName = !prop.Equals(default(DbSetProperty)) ? prop.Name : type.ClrType.Name;
             }
             return tableName;
         }
@@ -103,9 +100,9 @@ namespace Pomelo.EntityFrameworkCore.Lolita.Update
             {
                 throw new ArgumentException("Too many parameters in the expression.");
             }
-            var param = exp.Parameters.Single();
+            //var param = exp.Parameters.Single();
             var entities = (IDictionary<string, EntityType>)EntityTypesField.GetValue(context.Model);
-            var et = entities.Where(x => x.Value.ClrType == typeof(TEntity)).Single().Value;
+            var et = entities.Single(x => x.Value.ClrType == typeof(TEntity)).Value;
             ret.Table = GetTableName(et);
             ret.Schema = GetSchemaName(et);
 
@@ -116,14 +113,7 @@ namespace Pomelo.EntityFrameworkCore.Lolita.Update
                 throw new NotSupportedException(exp.Body.GetType().Name);
             }
             var columnAttr = body.Member.GetCustomAttribute<ColumnAttribute>();
-            if (columnAttr != null)
-            {
-                ret.Column = columnAttr.Name;
-            }
-            else
-            {
-                ret.Column = body.Member.Name;
-            }
+            ret.Column = columnAttr != null ? columnAttr.Name : body.Member.Name;
 
             return ret;
         }

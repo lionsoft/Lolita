@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Query;
 using Remotion.Linq;
 
+// ReSharper disable once CheckNamespace
 namespace Pomelo.EntityFrameworkCore.Lolita
 {
     internal static class DatabaseExtesions

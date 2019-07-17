@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Pomelo.EntityFrameworkCore.Lolita;
 using Pomelo.EntityFrameworkCore.Lolita.Update;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.EntityFrameworkCore
 {
     public static class DbSetExtensions
@@ -14,7 +13,7 @@ namespace Microsoft.EntityFrameworkCore
             where TEntity : class, new()
         {
             if (SetValueExpression == null)
-                throw new ArgumentNullException("SetValueExpression");
+                throw new ArgumentNullException(nameof(SetValueExpression));
 
             var factory = self.GetService<IFieldParser>();
             var sqlfield = factory.VisitField(SetValueExpression);
@@ -27,7 +26,7 @@ namespace Microsoft.EntityFrameworkCore
             where TEntity : class, new()
         {
             if (SetValueExpression == null)
-                throw new ArgumentNullException("SetValueExpression");
+                throw new ArgumentNullException(nameof(SetValueExpression));
 
             var factory = self.GetService<IFieldParser>();
             var sqlfield = factory.VisitField(SetValueExpression);

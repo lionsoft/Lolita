@@ -1,16 +1,12 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Query.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
-using Remotion.Linq.Parsing.Structure;
 using Pomelo.EntityFrameworkCore.Lolita;
 using Pomelo.EntityFrameworkCore.Lolita.Update;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.EntityFrameworkCore
 {
     public static class UpdateExtensions
@@ -18,8 +14,8 @@ namespace Microsoft.EntityFrameworkCore
         public static string GenerateBulkUpdateSql<TEntity>(this LolitaSetting<TEntity> self)
             where TEntity : class, new()
         {
-            var modelVisitor = self.Query.CompileQuery();
             var executor = self.Query.GetService<ILolitaUpdateExecutor>();
+            var modelVisitor = self.Query.CompileQuery(executor.QueryModelGenerator);
             var sql = executor.GenerateSql(self, modelVisitor);
             self.GetService<ILoggerFactory>().CreateLogger("Lolita Bulk Updating").LogInformation(sql);
             return sql;
@@ -33,7 +29,7 @@ namespace Microsoft.EntityFrameworkCore
             return executor.Execute(context, self.GenerateBulkUpdateSql(), self.Parameters.ToArray());
         }
 
-        public static Task<int> UpdateAsync<TEntity>(this LolitaSetting<TEntity> self, CancellationToken cancellationToken = default(CancellationToken))
+        public static Task<int> UpdateAsync<TEntity>(this LolitaSetting<TEntity> self, CancellationToken cancellationToken = default)
             where TEntity : class, new()
         {
             var executor = self.Query.GetService<ILolitaUpdateExecutor>();
