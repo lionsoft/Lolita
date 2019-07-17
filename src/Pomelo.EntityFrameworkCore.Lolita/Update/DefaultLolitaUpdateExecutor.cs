@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
@@ -6,17 +6,13 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace Pomelo.EntityFrameworkCore.Lolita.Update
 {
     public class DefaultLolitaUpdateExecutor : ILolitaUpdateExecutor
     {
-        public IQueryModelGenerator QueryModelGenerator { get; }
-
-        public DefaultLolitaUpdateExecutor(IQueryModelGenerator queryModelGenerator, ISqlGenerationHelper SqlGenerationHelper/*, ICurrentDbContext CurrentDbContext, IDbSetFinder DbSetFinder*/)
+        public DefaultLolitaUpdateExecutor(ISqlGenerationHelper SqlGenerationHelper/*, ICurrentDbContext CurrentDbContext, IDbSetFinder DbSetFinder*/)
         {
-            QueryModelGenerator = queryModelGenerator;
             sqlGenerationHelper = SqlGenerationHelper;
 /*
             dbSetFinder = DbSetFinder;

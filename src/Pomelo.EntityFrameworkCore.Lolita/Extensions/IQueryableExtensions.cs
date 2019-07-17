@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -14,15 +14,15 @@ namespace Microsoft.EntityFrameworkCore
 {
     public static class IQueryableExtensions
     {
-        public static string ToSql<TEntity>(this IQueryable<TEntity> self, IQueryModelGenerator queryModelGenerator)
+        public static string ToSql<TEntity>(this IQueryable<TEntity> self)
         {
-            var visitor = self.CompileQuery(queryModelGenerator);
+            var visitor = self.CompileQuery();
             return string.Join("", visitor.Queries.Select(x => x.ToString().TrimEnd().TrimEnd(';') + ";" + Environment.NewLine));
         }
 
-        public static IEnumerable<string> ToUnevaluated<TEntity>(this IQueryable<TEntity> self, IQueryModelGenerator queryModelGenerator)
+        public static IEnumerable<string> ToUnevaluated<TEntity>(this IQueryable<TEntity> self)
         {
-            var visitor = self.CompileQuery(queryModelGenerator);
+            var visitor = self.CompileQuery();
             return VisitExpression(visitor.Expression, null);
         }
 
@@ -72,7 +72,7 @@ namespace Microsoft.EntityFrameworkCore
             public static readonly PropertyInfo DependenciesOfQueryCompilerContextFactory = typeof(QueryCompilationContextFactory).GetTypeInfo().DeclaredProperties.Single(x => x.Name == "Dependencies");
         }
 
-        public static RelationalQueryModelVisitor CompileQuery<TEntity>(this IQueryable<TEntity> self, IQueryModelGenerator queryModelGenerator)
+        public static RelationalQueryModelVisitor CompileQuery<TEntity>(this IQueryable<TEntity> self)
         {
             var q = self as EntityQueryable<TEntity>;
             if (q == null)
@@ -84,7 +84,7 @@ namespace Microsoft.EntityFrameworkCore
             var database = (Database)ReflectionCommon.DatabaseOfQueryCompiler.GetValue(queryCompiler);
             var dependencies = (DatabaseDependencies)ReflectionCommon.DependenciesOfDatabase.GetValue(database);
             var factory = dependencies.QueryCompilationContextFactory;
-            var queryModel = queryModelGenerator.ParseQuery(self.Expression);
+            var queryModel = self.GetService<IQueryModelGenerator>().ParseQuery(self.Expression);
             var modelVisitor = (RelationalQueryModelVisitor)database.CreateVisitor(factory, queryModel);
             modelVisitor.CreateQueryExecutor<TEntity>(queryModel);
             return modelVisitor;

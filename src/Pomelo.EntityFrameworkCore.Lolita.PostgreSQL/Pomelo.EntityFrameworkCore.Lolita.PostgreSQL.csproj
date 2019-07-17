@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>2.0.3</VersionPrefix>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net47</TargetFrameworks>
     <AssemblyName>Pomelo.EntityFrameworkCore.Lolita.PostgreSQL</AssemblyName>
     <PackageId>Pomelo.EntityFrameworkCore.Lolita.PostgreSQL</PackageId>
     <PackageTags>Entity Framework Core;Extensions;Bulk Update;Bulk Delete</PackageTags>

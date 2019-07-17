@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -15,7 +15,7 @@ namespace Microsoft.EntityFrameworkCore
             where TEntity : class, new()
         {
             var executor = self.Query.GetService<ILolitaUpdateExecutor>();
-            var modelVisitor = self.Query.CompileQuery(executor.QueryModelGenerator);
+            var modelVisitor = self.Query.CompileQuery();
             var sql = executor.GenerateSql(self, modelVisitor);
             self.GetService<ILoggerFactory>().CreateLogger("Lolita Bulk Updating").LogInformation(sql);
             return sql;

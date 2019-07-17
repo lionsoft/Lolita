@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
 using System.Collections.Generic;
@@ -11,21 +11,18 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace Pomelo.EntityFrameworkCore.Lolita.Delete
 {
     public class DefaultLolitaDeleteExecutor : ILolitaDeleteExecutor
     {
-        public IQueryModelGenerator QueryModelGenerator { get; }
         private static readonly FieldInfo EntityTypesField = typeof(Model).GetTypeInfo().DeclaredFields.Single(x => x.Name == "_entityTypes");
 
-        public DefaultLolitaDeleteExecutor(IQueryModelGenerator queryModelGenerator, ICurrentDbContext CurrentDbContext, ISqlGenerationHelper SqlGenerationHelper, IDbSetFinder DbSetFinder)
+        public DefaultLolitaDeleteExecutor(ICurrentDbContext currentDbContext, ISqlGenerationHelper SqlGenerationHelper, IDbSetFinder DbSetFinder)
         {
-            QueryModelGenerator = queryModelGenerator;
             sqlGenerationHelper = SqlGenerationHelper;
             dbSetFinder = DbSetFinder;
-            context = CurrentDbContext.Context;
+            context = currentDbContext.Context;
         }
 
         private readonly ISqlGenerationHelper sqlGenerationHelper;
@@ -77,7 +74,7 @@ namespace Pomelo.EntityFrameworkCore.Lolita.Delete
         {
             var sb = new StringBuilder("DELETE FROM ");
             //var model = lolita.ElementType;
-            var visitor = lolita.CompileQuery(QueryModelGenerator);
+            var visitor = lolita.CompileQuery();
 
             var entities = (IDictionary<string, EntityType>)EntityTypesField.GetValue(context.Model);
             var et = entities.Single(x => x.Value.ClrType == typeof(TEntity)).Value;
